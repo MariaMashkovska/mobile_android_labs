@@ -9,9 +9,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const MagicCounterScreen(),
+      home: MagicCounterScreen(),
     );
   }
 }
@@ -25,31 +25,31 @@ class MagicCounterScreen extends StatefulWidget {
 
 class _MagicCounterScreenState extends State<MagicCounterScreen> {
   int _counter = 0;
-  String _message = "";
+  String _message = '';
   final TextEditingController _controller = TextEditingController();
 
   void _handleInput() {
-    String input = _controller.text.trim();
+    final String input = _controller.text.trim();
 
-    if (input == "avada kedavra") {
+    if (input == 'avada kedavra') {
       setState(() {
         _counter = 0;
-        _message = "Закляття спрацювало!";
+        _message = 'Закляття спрацювало!';
       });
-    } else if (input == "Крокоділо Бомбарділо") {
+    } else if (input == 'bombardiro krokodilo') {
       setState(() {
-        _message = "تم تنفيذ التعويذة! allah akbar"; //
+        _message = 'تم تنفيذ التعويذة! allah akbar';
       });
     } else {
-      int? value = int.tryParse(input);
+      final int? value = int.tryParse(input);
       if (value != null) {
         setState(() {
           _counter += value;
-          _message = "";
+          _message = '';
         });
       } else {
         setState(() {
-          _message = "Ти не тикай";
+          _message = 'Ти не тикай';
         });
       }
     }
@@ -62,7 +62,7 @@ class _MagicCounterScreenState extends State<MagicCounterScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Магічний лічильник')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -74,7 +74,7 @@ class _MagicCounterScreenState extends State<MagicCounterScreen> {
             TextField(
               controller: _controller,
               decoration: const InputDecoration(
-                labelText: "Введіть число або закляття...",
+                labelText: 'Введіть число або закляття...',
                 border: OutlineInputBorder(),
               ),
               onSubmitted: (_) => _handleInput(),
@@ -82,7 +82,7 @@ class _MagicCounterScreenState extends State<MagicCounterScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _handleInput,
-              child: const Text("Примінити магію"),
+              child: const Text('Примінити магію'),
             ),
             const SizedBox(height: 16),
             Text(
@@ -90,7 +90,7 @@ class _MagicCounterScreenState extends State<MagicCounterScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: _message == "Ти не тикай" ? Colors.red : Colors.green,
+                color: _message == 'Ти не тикай' ? Colors.red : Colors.green,
               ),
             ),
           ],
