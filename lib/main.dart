@@ -1,100 +1,278 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MagicCounterScreen(),
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.black,
+        primaryColor: Colors.orange,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.orange),
+          bodyMedium: TextStyle(color: Colors.orange),
+          titleLarge: TextStyle(color: Colors.orange),
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.orange,
+          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
+          iconTheme: IconThemeData(color: Colors.black),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.black,
+          ),
+        ),
+      ),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => LoginScreen(),
+        '/register': (context) => RegisterScreen(),
+        '/home': (context) => HomeScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/calendar': (context) => CalendarScreen(),
+      },
     );
   }
 }
 
-class MagicCounterScreen extends StatefulWidget {
-  const MagicCounterScreen({super.key});
+// LOGIN
 
+class LoginScreen extends StatefulWidget {
   @override
-  State<MagicCounterScreen> createState() => _MagicCounterScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _MagicCounterScreenState extends State<MagicCounterScreen> {
-  int _counter = 0;
-  String _message = '';
-  final TextEditingController _controller = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  void _handleInput() {
-    final String input = _controller.text.trim();
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    emailController.text = prefs.getString('email') ?? '';
+  }
 
-    if (input == 'avada kedavra') {
-      setState(() {
-        _counter = 0;
-        _message = 'Закляття спрацювало!';
-      });
-    } else if (input == 'bombardiro krokodilo') {
-      setState(() {
-        _message = 'تم تنفيذ التعويذة! allah akbar';
-      });
-    } else {
-      final int? value = int.tryParse(input);
-      if (value != null) {
-        setState(() {
-          _counter += value;
-          _message = '';
-        });
-      } else {
-        setState(() {
-          _message = 'Ти не тикай';
-        });
-      }
-    }
-
-    _controller.clear();
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Магічний лічильник')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              '$_counter',
-              style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'Введіть число або закляття...',
-                border: OutlineInputBorder(),
-              ),
-              onSubmitted: (_) => _handleInput(),
-            ),
-            const SizedBox(height: 16),
+            Text('Login', style: TextStyle(fontSize: 24)),
+            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
+            TextField(controller: passwordController, decoration: InputDecoration(labelText: 'Password'), obscureText: true),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _handleInput,
-              child: const Text('Примінити магію'),
+              onPressed: () => Navigator.pushNamed(context, '/home'),
+              child: Text('Enter'),
             ),
-            const SizedBox(height: 16),
-            Text(
-              _message,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: _message == 'Ти не тикай' ? Colors.red : Colors.green,
-              ),
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, '/register'),
+              child: Text('Register'),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// REGISTER
+
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+
+  Future<void> saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString('email') == null) {
+      await prefs.setString('name', nameController.text);
+      await prefs.setString('email', emailController.text);
+      await prefs.setString('dob', dobController.text);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Register', style: TextStyle(fontSize: 24)),
+            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Name')),
+            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
+            TextField(controller: passwordController, decoration: InputDecoration(labelText: 'Password'), obscureText: true),
+            TextField(controller: dobController, decoration: InputDecoration(labelText: 'Date of Birth')),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                saveUserData();
+                Navigator.pushNamed(context, '/home');
+              },
+              child: Text('Sign Up'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, '/login'),
+              child: Text('Back to Login'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// PROFILE
+
+class ProfileScreen extends StatefulWidget {
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nameController.text = prefs.getString('name') ?? '';
+      emailController.text = prefs.getString('email') ?? '';
+      dobController.text = prefs.getString('dob') ?? '';
+    });
+  }
+
+  Future<void> updateUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', nameController.text);
+    await prefs.setString('email', emailController.text);
+    await prefs.setString('dob', dobController.text);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Profile')),
+      body: Center(
+        child: Column(
+          children: [
+            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Name')),
+            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
+            TextField(controller: dobController, decoration: InputDecoration(labelText: 'Date of Birth')),
+            ElevatedButton(
+              onPressed: () {
+                updateUserData();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile Updated!')));
+              },
+              child: Text('Save'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/login'),
+              child: Text('Logout'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// HOME SCREEN
+
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Noise Sensor')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 20),
+            Text(
+              'Noise Level: '
+                  'unknown silly'
+                  '',
+              style: TextStyle(fontSize: 24, color: Colors.orange),
+            ),
+
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/profile'),
+              child: Text('Go to Profile'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/calendar'),
+              child: Text('Go to Calendar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// CALENDAR SCREEN
+
+class CalendarScreen extends StatefulWidget {
+  @override
+  _CalendarScreenState createState() => _CalendarScreenState();
+}
+
+class _CalendarScreenState extends State<CalendarScreen> {
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Calendar')),
+      body: Column(
+        children: [
+          TableCalendar(
+            focusedDay: _focusedDay,
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            calendarFormat: _calendarFormat,
+          ),
+          Expanded(
+            child: LineChart(LineChartData(lineBarsData: [LineChartBarData(spots: [])])),
+          ),
+        ],
       ),
     );
   }
