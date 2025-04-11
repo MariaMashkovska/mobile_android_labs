@@ -1,13 +1,15 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,12 +18,12 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black,
         primaryColor: Colors.orange,
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.orange),
           bodyMedium: TextStyle(color: Colors.orange),
           titleLarge: TextStyle(color: Colors.orange),
         ),
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Colors.orange,
           titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
           iconTheme: IconThemeData(color: Colors.black),
@@ -35,21 +37,21 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/login',
       routes: {
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
-        '/profile': (context) => ProfileScreen(),
-        '/calendar': (context) => CalendarScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/calendar': (context) => const CalendarScreen(),
       },
     );
   }
 }
 
-// LOGIN
-
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -71,33 +73,44 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Login', style: TextStyle(fontSize: 24)),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
-            TextField(controller: passwordController, decoration: InputDecoration(labelText: 'Password'), obscureText: true),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/home'),
-              child: Text('Enter'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pushNamed(context, '/register'),
-              child: Text('Register'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Login', style: TextStyle(fontSize: 24)),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+                child: const Text('Enter'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pushReplacementNamed(context, '/register'),
+                child: const Text('Register'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// REGISTER
-
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
@@ -120,39 +133,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Register', style: TextStyle(fontSize: 24)),
-            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Name')),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
-            TextField(controller: passwordController, decoration: InputDecoration(labelText: 'Password'), obscureText: true),
-            TextField(controller: dobController, decoration: InputDecoration(labelText: 'Date of Birth')),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                saveUserData();
-                Navigator.pushNamed(context, '/home');
-              },
-              child: Text('Sign Up'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pushNamed(context, '/login'),
-              child: Text('Back to Login'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Register', style: TextStyle(fontSize: 24)),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+              TextField(
+                controller: dobController,
+                decoration: const InputDecoration(labelText: 'Date of Birth'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  saveUserData();
+                  Navigator.pushReplacementNamed(context, '/home');
+                },
+                child: const Text('Sign Up'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                child: const Text('Back to Login'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// PROFILE
-
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -185,58 +214,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
+      appBar: AppBar(title: const Text('Profile')),
       body: Center(
-        child: Column(
-          children: [
-            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Name')),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
-            TextField(controller: dobController, decoration: InputDecoration(labelText: 'Date of Birth')),
-            ElevatedButton(
-              onPressed: () {
-                updateUserData();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile Updated!')));
-              },
-              child: Text('Save'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/login'),
-              child: Text('Logout'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              TextField(
+                controller: dobController,
+                decoration: const InputDecoration(labelText: 'Date of Birth'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  updateUserData();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Profile Updated!')),
+                  );
+                },
+                child: const Text('Save'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                child: const Text('Logout'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-
-// HOME SCREEN
-
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Noise Sensor')),
+      appBar: AppBar(title: const Text('Noise Sensor')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            Text(
-              'Noise Level: '
-                  'unknown silly'
-                  '',
+            const SizedBox(height: 20),
+            const Text(
+              'Noise Level: unknown silly',
               style: TextStyle(fontSize: 24, color: Colors.orange),
             ),
-
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/profile'),
-              child: Text('Go to Profile'),
+              child: const Text('Go to Profile'),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/calendar'),
-              child: Text('Go to Calendar'),
+              child: const Text('Go to Calendar'),
             ),
           ],
         ),
@@ -245,32 +285,43 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// CALENDAR SCREEN
-
 class CalendarScreen extends StatefulWidget {
+  const CalendarScreen({super.key});
+
   @override
-  _CalendarScreenState createState() => _CalendarScreenState();
+  State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
+  final DateTime _focusedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Calendar')),
+      appBar: AppBar(title: const Text('Calendar')),
       body: Column(
         children: [
-          TableCalendar(
+          TableCalendar<void>(
             focusedDay: _focusedDay,
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             calendarFormat: _calendarFormat,
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {});
+            },
           ),
           Expanded(
-            child: LineChart(LineChartData(lineBarsData: [LineChartBarData(spots: [])])),
+            child: LineChart(
+              LineChartData(
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: const [FlSpot(0, 1), FlSpot(1, 3), FlSpot(2, 2)],
+                    color: Colors.orange,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
