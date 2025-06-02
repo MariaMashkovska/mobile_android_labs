@@ -1,41 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_android/data/datasources/user_local_data_source_impl.dart';
+import 'package:mobile_android/data/repositories/auth_repository_impl.dart';
+import 'package:mobile_android/presentation/cubit/connectivity_cubit.dart';
+import 'package:mobile_android/presentation/providers/auth_provider.dart';
+import 'package:mobile_android/presentation/providers/noise_provider.dart';
+import 'package:mobile_android/presentation/screens/calendar/calendar_screen.dart';
+import 'package:mobile_android/presentation/screens/home/home_screen.dart';
+import 'package:mobile_android/presentation/screens/login/login_screen.dart';
+import 'package:mobile_android/presentation/screens/profile/profile_screen.dart';
+import 'package:mobile_android/presentation/screens/register/register_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/profile_screen.dart';
-import 'services/shared_prefs_user_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final userService = SharedPrefsUserService(prefs);
-  final isLoggedIn = await userService.isLoggedIn();
 
-  runApp(MyApp(initialRoute: isLoggedIn ? '/home' : '/login', userService: userService));
+  final prefs = await SharedPreferences.getInstance();
+  final localDataSource = UserLocalDataSourceImpl(prefs: prefs);
+  final authRepo = AuthRepositoryImpl(localDataSource: localDataSource);
+  final authProvider = AuthProvider(authRepo);
+  await authProvider.loadUser();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => authProvider),
+        ChangeNotifierProvider(create: (_) => NoiseProvider()),
+      ],
+      child: BlocProvider(
+        create: (_) => ConnectivityCubit(),
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final String initialRoute;
-  final SharedPrefsUserService userService;
-
-  const MyApp({super.key, required this.initialRoute, required this.userService});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context);
+    final initialRoute = auth.isLoggedIn ? '/home' : '/login';
+
     return MaterialApp(
-      title: 'User App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.orange,
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.orange,
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.orange,
+          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20),
+          iconTheme: IconThemeData(color: Colors.black),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.black,
+          ),
+        ),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.orange),
+          bodyMedium: TextStyle(color: Colors.orange),
+          titleLarge: TextStyle(color: Colors.orange),
+        ),
       ),
       initialRoute: initialRoute,
       routes: {
-        '/login': (context) => LoginScreen(userService: userService),
-        '/register': (context) => RegisterScreen(userService: userService),
-        '/profile': (context) => ProfileScreen(userService: userService),
-        '/home': (context) => HomeScreen(userService: userService),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/calendar': (context) => const CalendarScreen(),
       },
     );
   }
